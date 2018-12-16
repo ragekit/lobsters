@@ -7,7 +7,8 @@ class LoginFailedError < StandardError; end
 class LoginController < ApplicationController
   before_action :authenticate_user
   before_action :check_for_read_only_mode, :except => [:index]
-
+  skip_before_action :check_for_private_instance
+  
   def logout
     if @user
       reset_session

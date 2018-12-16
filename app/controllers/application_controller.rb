@@ -2,6 +2,7 @@ class ApplicationController < ActionController::Base
   protect_from_forgery
   before_action :authenticate_user
   before_action :increase_traffic_counter
+  before_action :check_for_private_instance
 
   TRAFFIC_DECREMENTER = 0.50
 
@@ -29,6 +30,16 @@ class ApplicationController < ActionController::Base
     end
 
     true
+  end
+
+  def  check_for_private_instance
+    Rails.logger.info " you are #{@user} and the server is  private #{Rails.application.private_instance?} "
+    if Rails.application.private_instance? && !@user
+      if request.get?
+        session[:redirect_to] = request.original_fullpath
+      end
+      redirect_to "/login"
+    end
   end
 
   def check_for_read_only_mode
